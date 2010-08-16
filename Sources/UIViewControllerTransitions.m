@@ -64,13 +64,22 @@ static void RemoveViewController(UIViewController* viewController)
 	
 	viewController.view.frame = self.view.frame;
 
+	// If the parent of this modal view controller is a UITabBarController then we need to adjust the origin
+	// of the view so that we are not under the status bar. (If not hidden)
+
+	if ([self isKindOfClass: [UITabBarController class]]) {
+		if ([[UIApplication sharedApplication] isStatusBarHidden] == NO) {
+			CGRect statusBarFrame = [[UIApplication sharedApplication] statusBarFrame];
+			CGRect frame = viewController.view.frame;
+			frame.origin.y = statusBarFrame.size.height;
+			viewController.view.frame = frame;
+		}
+	}
+
 	switch (transitionStyle)
 	{
 		case UIViewControllerTransitionStylePushInFromRight:
 		{
-			CGRect frame = viewController.view.frame;
-			viewController.view.frame = frame;
-
 			UIWindow* window = [[UIApplication sharedApplication] keyWindow];
 			[window addSubview: viewController.view];
 
@@ -104,9 +113,6 @@ static void RemoveViewController(UIViewController* viewController)
 
 		case UIViewControllerTransitionStylePushInFromLeft:
 		{
-			CGRect frame = viewController.view.frame;
-			viewController.view.frame = frame;
-
 			UIWindow* window = [[UIApplication sharedApplication] keyWindow];
 			[window addSubview: viewController.view];
 
